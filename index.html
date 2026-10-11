@@ -10,6 +10,16 @@
 </head>
 <body class="bg-slate-50 font-sans">
 
+    <!-- CONNECTION ERROR / OFFLINE OVERLAY -->
+    <div id="offline-overlay" class="hidden fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center p-6 text-center">
+        <div class="bg-white p-8 rounded-2xl max-w-md shadow-2xl border border-red-100">
+            <div class="text-red-500 text-5xl mb-4">⚠️</div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Database Connection Failed</h2>
+            <p class="text-slate-600 text-sm mb-6">Could not reach Supabase. Your project might be paused due to inactivity, or you have an internet connectivity issue.</p>
+            <button onclick="location.reload()" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">Retry Connection</button>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN -->
     <div id="login-section" class="flex items-center justify-center h-screen">
         <div class="bg-white p-8 rounded-xl shadow-lg w-96 border border-slate-100">
@@ -81,11 +91,24 @@
             <!-- MANAGER VIEW -->
             <div id="view-manager" class="role-view hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Catalog Grid -->
-                    <div class="lg:col-span-2">
-                        <h3 class="text-lg font-bold mb-3 text-slate-700">🛍️ Store Catalog & Bulk POS Cart</h3>
-                        <div id="manager-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[550px] overflow-y-auto p-2"></div>
+                    <!-- Catalog Grid & Price Editor -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold mb-3 text-slate-700">🛍️ Store Catalog & Bulk POS Cart</h3>
+                            <div id="manager-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
+                        </div>
+
+                        <!-- Price Update Panel -->
+                        <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
+                            <h4 class="font-bold text-base mb-3 text-blue-600">💲 Update Product Price</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <select id="price-product" class="p-2.5 border rounded-lg bg-white text-sm"></select>
+                                <input type="number" id="new-price" step="0.01" placeholder="New Price (₹)" class="p-2.5 border rounded-lg bg-white text-sm">
+                                <button onclick="updatePrice()" class="bg-blue-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition">Update Price</button>
+                            </div>
+                        </div>
                     </div>
+
                     <!-- Cart & Checkout Sidebar -->
                     <div class="bg-slate-50 p-5 border border-slate-200 rounded-xl flex flex-col justify-between">
                         <div>
@@ -110,7 +133,7 @@
 
     <!-- MODAL FOR RESTOCK REQUEST -->
     <div id="restock-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-96">
+        <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
             <h3 class="font-bold text-lg mb-4">Request Restock</h3>
             <select id="restock-prod-select" class="w-full p-2.5 border rounded-lg mb-3"></select>
             <input type="number" id="restock-qty" placeholder="Quantity needed" min="1" value="10" class="w-full p-2.5 border rounded-lg mb-4">
@@ -123,7 +146,7 @@
 
     <!-- MODAL FOR NEW PRODUCT (PROVIDER) -->
     <div id="newprod-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-96">
+        <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
             <h3 class="font-bold text-lg mb-4">Propose New Product to Owner</h3>
             <input type="text" id="np-name" placeholder="Product Name" class="w-full p-2.5 border rounded-lg mb-3">
             <input type="text" id="np-category" placeholder="Category" class="w-full p-2.5 border rounded-lg mb-3">
