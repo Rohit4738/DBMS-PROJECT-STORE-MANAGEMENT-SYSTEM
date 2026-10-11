@@ -8,121 +8,117 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 font-sans">
+<body class="bg-zinc-100 font-sans text-zinc-900">
 
     <!-- CONNECTION ERROR / OFFLINE OVERLAY -->
-    <div id="offline-overlay" class="hidden fixed inset-0 bg-slate-900/90 z-50 flex items-center justify-center p-6 text-center">
-        <div class="bg-white p-8 rounded-2xl max-w-md shadow-2xl border border-red-100">
-            <div class="text-red-500 text-5xl mb-4">⚠️</div>
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Database Connection Failed</h2>
-            <p class="text-slate-600 text-sm mb-6">Could not reach Supabase. Your project might be paused due to inactivity, or you have an internet connectivity issue.</p>
-            <button onclick="location.reload()" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">Retry Connection</button>
+    <div id="offline-overlay" class="hidden fixed inset-0 bg-zinc-950/90 z-50 flex items-center justify-center p-6 text-center">
+        <div class="bg-white p-8 rounded-lg max-w-md shadow-2xl border border-zinc-200">
+            <div class="text-amber-600 text-4xl mb-3 font-mono">⚠️</div>
+            <h2 class="text-xl font-bold text-zinc-900 mb-2">Database Connection Failed</h2>
+            <p class="text-zinc-600 text-sm mb-6">Could not reach Supabase. Your project might be paused or offline.</p>
+            <button onclick="location.reload()" class="w-full bg-zinc-900 text-white py-2 rounded-lg font-bold hover:bg-zinc-800 transition">Retry Connection</button>
         </div>
     </div>
 
     <!-- LOGIN SCREEN -->
     <div id="login-section" class="flex items-center justify-center h-screen">
-        <div class="bg-white p-8 rounded-xl shadow-lg w-96 border border-slate-100">
+        <div class="bg-white p-8 rounded-lg shadow-sm w-96 border border-zinc-300">
             <div class="text-center mb-6">
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">MSBTE K-Scheme Project</span>
-                <h2 class="text-2xl font-bold text-slate-800 mt-2">StoreMS Portal</h2>
+                <span class="bg-zinc-200 text-zinc-800 text-xs font-mono px-2 py-1 uppercase tracking-wider">MSBTE K-Scheme</span>
+                <h2 class="text-2xl font-black text-zinc-900 mt-3 tracking-tight">STOREMS PORTAL</h2>
             </div>
             <form onsubmit="handleLogin(event)">
                 <div class="mb-4">
-                    <label class="block text-slate-700 text-sm font-bold mb-2">Username</label>
-                    <input type="text" id="username" placeholder="owner / provider / manager" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <label class="block text-zinc-700 text-xs font-bold uppercase mb-1">Username</label>
+                    <input type="text" id="username" placeholder="owner / provider / manager" class="w-full px-3 py-2 border border-zinc-300 rounded focus:outline-none focus:border-zinc-900" required>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-slate-700 text-sm font-bold mb-2">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <label class="block text-zinc-700 text-xs font-bold uppercase mb-1">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" class="w-full px-3 py-2 border border-zinc-300 rounded focus:outline-none focus:border-zinc-900" required>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 font-bold transition">Secure Login</button>
+                <button type="submit" class="w-full bg-zinc-900 text-white py-2.5 rounded font-bold hover:bg-zinc-800 transition tracking-wide text-sm">AUTHENTICATE</button>
             </form>
-            <p id="login-error" class="text-red-500 text-sm mt-4 text-center hidden font-medium">Invalid credentials!</p>
+            <p id="login-error" class="text-red-600 text-xs mt-4 text-center hidden font-bold uppercase">Invalid credentials!</p>
         </div>
     </div>
 
     <!-- EASTER EGG SCREEN (User: 67) -->
     <div id="easter-egg-screen" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center cursor-pointer z-50" onclick="logout()">
-        <h1 class="text-white text-8xl font-black tracking-widest animate-pulse">67</h1>
-        <p class="text-gray-500 text-sm mt-4">Click anywhere to return</p>
+        <h1 class="text-white text-8xl font-black tracking-widest animate-pulse font-mono">67</h1>
+        <p class="text-zinc-500 text-xs mt-4 font-mono tracking-widest">[ CLICK ANYWHERE TO EXIT ]</p>
     </div>
 
     <!-- MAIN DASHBOARD -->
     <div id="dashboard-section" class="hidden min-h-screen p-6">
-        <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md p-6 border border-slate-100">
-            <div class="flex justify-between items-center border-b pb-4 mb-6">
+        <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-6 border border-zinc-300">
+            <div class="flex justify-between items-center border-b border-zinc-200 pb-4 mb-6">
                 <div>
-                    <h1 id="dashboard-title" class="text-2xl font-bold text-slate-800">Dashboard</h1>
-                    <p class="text-xs text-slate-500">Cloud Database Connected via Supabase</p>
+                    <h1 id="dashboard-title" class="text-xl font-black text-zinc-900 tracking-tight">DASHBOARD</h1>
+                    <p class="text-xs text-zinc-500 font-mono">Connected to Supabase (PostgreSQL)</p>
                 </div>
-                <div class="flex gap-3">
-                    <button id="inbox-btn" onclick="toggleInbox()" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 font-medium text-sm transition">📥 Inbox <span id="inbox-badge" class="bg-white text-amber-700 px-1.5 py-0.2 rounded-full text-xs font-bold">0</span></button>
-                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 font-medium text-sm transition">Logout</button>
+                <div class="flex gap-2">
+                    <button id="inbox-btn" onclick="toggleInbox()" class="bg-zinc-200 text-zinc-800 px-3 py-2 rounded text-xs font-bold hover:bg-zinc-300 transition">INBOX <span id="inbox-badge" class="bg-zinc-900 text-white px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
+                    <button onclick="logout()" class="bg-zinc-900 text-white px-3 py-2 rounded text-xs font-bold hover:bg-zinc-800 transition">LOGOUT</button>
                 </div>
             </div>
 
-            <!-- INBOX MODAL / VIEW -->
-            <div id="inbox-view" class="hidden mb-8 bg-amber-50 border border-amber-200 p-5 rounded-xl">
-                <h3 class="text-lg font-bold mb-3 text-amber-900">📥 Notification & Request Inbox</h3>
-                <div id="inbox-list" class="space-y-3">
-                    <p class="text-sm text-slate-600">No pending requests.</p>
+            <!-- INBOX VIEW -->
+            <div id="inbox-view" class="hidden mb-6 bg-zinc-50 border border-zinc-300 p-4 rounded">
+                <h3 class="text-sm font-bold uppercase mb-3 text-zinc-800">Pending Requests & Approvals</h3>
+                <div id="inbox-list" class="space-y-2">
+                    <p class="text-xs text-zinc-500 italic">No pending items.</p>
                 </div>
             </div>
 
             <!-- OWNER VIEW -->
             <div id="view-owner" class="role-view hidden">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-slate-700">📊 Owner Analytics: Grid Catalog & Restock Requests</h3>
-                    <button onclick="openRestockModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">Request Restock from Provider</button>
+                    <h3 class="text-sm font-bold uppercase text-zinc-700 tracking-wider">Inventory & Warehouse Audit</h3>
+                    <button onclick="openRestockModal()" class="bg-zinc-900 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-zinc-800">Request Restock</button>
                 </div>
-                <div id="owner-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2"></div>
+                <div id="owner-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[550px] overflow-y-auto p-1"></div>
             </div>
 
             <!-- PROVIDER VIEW -->
             <div id="view-provider" class="role-view hidden">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-slate-700">📦 Provider Supply Chain & Custom Products</h3>
-                    <button onclick="openNewProductModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">+ Create Custom Product</button>
+                    <h3 class="text-sm font-bold uppercase text-zinc-700 tracking-wider">Supply Chain Fulfillment</h3>
+                    <button onclick="openNewProductModal()" class="bg-zinc-900 text-white px-3 py-1.5 rounded text-xs font-bold hover:bg-zinc-800">+ Propose New Product</button>
                 </div>
-                <div id="provider-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2"></div>
+                <div id="provider-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[550px] overflow-y-auto p-1"></div>
             </div>
 
             <!-- MANAGER VIEW -->
             <div id="view-manager" class="role-view hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Catalog Grid & Price Editor -->
-                    <div class="lg:col-span-2 space-y-6">
+                    <div class="lg:col-span-2 space-y-4">
                         <div>
-                            <h3 class="text-lg font-bold mb-3 text-slate-700">🛍️ Store Catalog & Bulk POS Cart</h3>
-                            <div id="manager-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto p-2"></div>
+                            <h3 class="text-sm font-bold uppercase text-zinc-700 tracking-wider mb-2">POS Retail Catalog</h3>
+                            <div id="manager-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-h-[380px] overflow-y-auto p-1"></div>
                         </div>
-
-                        <!-- Price Update Panel -->
-                        <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl">
-                            <h4 class="font-bold text-base mb-3 text-blue-600">💲 Update Product Price</h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <select id="price-product" class="p-2.5 border rounded-lg bg-white text-sm"></select>
-                                <input type="number" id="new-price" step="0.01" placeholder="New Price (₹)" class="p-2.5 border rounded-lg bg-white text-sm">
-                                <button onclick="updatePrice()" class="bg-blue-600 text-white py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition">Update Price</button>
+                        <div class="bg-zinc-50 p-4 border border-zinc-300 rounded">
+                            <h4 class="text-xs font-bold uppercase mb-2 text-zinc-700">Dynamic Pricing Engine</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <select id="price-product" class="p-2 border border-zinc-300 rounded text-xs bg-white"></select>
+                                <input type="number" id="new-price" step="0.01" placeholder="New Price (₹)" class="p-2 border border-zinc-300 rounded text-xs bg-white">
+                                <button onclick="updatePrice()" class="bg-zinc-900 text-white py-2 rounded text-xs font-bold hover:bg-zinc-800">Update Price</button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Cart & Checkout Sidebar -->
-                    <div class="bg-slate-50 p-5 border border-slate-200 rounded-xl flex flex-col justify-between">
+                    <div class="bg-zinc-50 p-4 border border-zinc-300 rounded flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-base mb-3 text-blue-600">🛒 Bulk Checkout Cart</h4>
-                            <div id="cart-items" class="space-y-2 mb-4 max-h-64 overflow-y-auto text-sm">
-                                <p class="text-slate-500 italic">Cart is empty</p>
+                            <h4 class="text-xs font-bold uppercase mb-3 text-zinc-700 tracking-wider">Active POS Cart</h4>
+                            <div id="cart-items" class="space-y-2 mb-4 max-h-56 overflow-y-auto text-xs font-mono">
+                                <p class="text-zinc-500 italic">Cart is empty</p>
                             </div>
                         </div>
-                        <div class="border-t pt-4">
-                            <div class="flex justify-between font-bold text-lg mb-4">
-                                <span>Total:</span>
+                        <div class="border-t border-zinc-300 pt-3">
+                            <div class="flex justify-between font-black text-sm mb-3">
+                                <span>TOTAL:</span>
                                 <span id="cart-total">₹0.00</span>
                             </div>
-                            <button onclick="checkoutCart()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">Complete Bulk Checkout</button>
+                            <button onclick="checkoutCart()" class="w-full bg-zinc-900 text-white py-2.5 rounded text-xs font-bold hover:bg-zinc-800 tracking-wide">PROCESS CHECKOUT</button>
                         </div>
                     </div>
                 </div>
@@ -131,47 +127,45 @@
         </div>
     </div>
 
-    <!-- MODAL FOR RESTOCK REQUEST -->
-    <div id="restock-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
-            <h3 class="font-bold text-lg mb-4">Request Restock</h3>
-            <select id="restock-prod-select" class="w-full p-2.5 border rounded-lg mb-3"></select>
-            <input type="number" id="restock-qty" placeholder="Quantity needed" min="1" value="10" class="w-full p-2.5 border rounded-lg mb-4">
+    <!-- MODALS -->
+    <div id="restock-modal" class="hidden fixed inset-0 bg-zinc-950/60 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-96 border border-zinc-300 shadow-xl">
+            <h3 class="font-bold text-sm uppercase mb-3">Request Restock</h3>
+            <select id="restock-prod-select" class="w-full p-2 border border-zinc-300 rounded mb-3 text-xs"></select>
+            <input type="number" id="restock-qty" min="1" value="10" class="w-full p-2 border border-zinc-300 rounded mb-4 text-xs">
             <div class="flex gap-2">
-                <button onclick="submitRestockRequest()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold">Send Request</button>
-                <button onclick="closeModals()" class="flex-1 bg-gray-300 py-2 rounded-lg font-bold">Cancel</button>
+                <button onclick="submitRestockRequest()" class="flex-1 bg-zinc-900 text-white py-2 rounded text-xs font-bold">Send</button>
+                <button onclick="closeModals()" class="flex-1 bg-zinc-200 py-2 rounded text-xs font-bold">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL FOR NEW PRODUCT (PROVIDER) -->
-    <div id="newprod-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-96 shadow-xl">
-            <h3 class="font-bold text-lg mb-4">Propose New Product to Owner</h3>
-            <input type="text" id="np-name" placeholder="Product Name" class="w-full p-2.5 border rounded-lg mb-3">
-            <input type="text" id="np-category" placeholder="Category" class="w-full p-2.5 border rounded-lg mb-3">
-            <input type="number" id="np-price" placeholder="Price (₹)" class="w-full p-2.5 border rounded-lg mb-3">
-            <input type="number" id="np-qty" placeholder="Initial Warehouse Stock" class="w-full p-2.5 border rounded-lg mb-4">
+    <div id="newprod-modal" class="hidden fixed inset-0 bg-zinc-950/60 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-96 border border-zinc-300 shadow-xl">
+            <h3 class="font-bold text-sm uppercase mb-3">Propose New Product</h3>
+            <input type="text" id="np-name" placeholder="Name" class="w-full p-2 border border-zinc-300 rounded mb-2 text-xs">
+            <input type="text" id="np-category" placeholder="Category" class="w-full p-2 border border-zinc-300 rounded mb-2 text-xs">
+            <input type="number" id="np-price" placeholder="Price (₹)" class="w-full p-2 border border-zinc-300 rounded mb-2 text-xs">
+            <input type="number" id="np-qty" placeholder="Initial Whse Stock" class="w-full p-2 border border-zinc-300 rounded mb-4 text-xs">
             <div class="flex gap-2">
-                <button onclick="submitNewProductProposal()" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold">Submit to Owner</button>
-                <button onclick="closeModals()" class="flex-1 bg-gray-300 py-2 rounded-lg font-bold">Cancel</button>
+                <button onclick="submitNewProductProposal()" class="flex-1 bg-zinc-900 text-white py-2 rounded text-xs font-bold">Submit</button>
+                <button onclick="closeModals()" class="flex-1 bg-zinc-200 py-2 rounded text-xs font-bold">Cancel</button>
             </div>
         </div>
     </div>
 
-    <!-- RECEIPT MODAL -->
-    <div id="receipt-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-xl w-[400px] border shadow-2xl font-mono text-sm">
-            <div class="text-center border-b pb-3 mb-3">
-                <h2 class="font-bold text-lg">STOREMS OFFICIAL RECEIPT</h2>
-                <p class="text-xs text-gray-500" id="receipt-date"></p>
+    <div id="receipt-modal" class="hidden fixed inset-0 bg-zinc-950/60 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded w-[380px] border border-zinc-400 shadow-2xl font-mono text-xs">
+            <div class="text-center border-b border-dashed border-zinc-400 pb-2 mb-2">
+                <h2 class="font-bold text-sm">STOREMS TAX INVOICE</h2>
+                <p class="text-[10px]" id="receipt-date"></p>
             </div>
-            <div id="receipt-body" class="space-y-2 mb-4"></div>
-            <div class="border-t pt-3 flex justify-between font-bold text-base">
-                <span>GRAND TOTAL:</span>
+            <div id="receipt-body" class="space-y-1 mb-3"></div>
+            <div class="border-t border-dashed border-zinc-400 pt-2 flex justify-between font-bold text-sm">
+                <span>TOTAL:</span>
                 <span id="receipt-grand-total">₹0.00</span>
             </div>
-            <button onclick="closeReceipt()" class="mt-5 w-full bg-slate-800 text-white py-2 rounded font-sans font-bold">Close Receipt</button>
+            <button onclick="closeReceipt()" class="mt-4 w-full bg-zinc-900 text-white py-1.5 rounded font-sans font-bold text-xs">CLOSE RECEIPT</button>
         </div>
     </div>
 
