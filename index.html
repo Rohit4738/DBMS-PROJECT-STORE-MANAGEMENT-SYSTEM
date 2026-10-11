@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StoreMS - Store Management System</title>
-    <!-- Tailwind CSS -->
+    <title>StoreMS - Enterprise Store Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
-    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-50 font-sans">
@@ -17,7 +14,7 @@
     <div id="login-section" class="flex items-center justify-center h-screen">
         <div class="bg-white p-8 rounded-xl shadow-lg w-96 border border-slate-100">
             <div class="text-center mb-6">
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">MSBTE Micro-Project</span>
+                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">MSBTE K-Scheme Project</span>
                 <h2 class="text-2xl font-bold text-slate-800 mt-2">StoreMS Portal</h2>
             </div>
             <form onsubmit="handleLogin(event)">
@@ -35,86 +32,75 @@
         </div>
     </div>
 
+    <!-- EASTER EGG SCREEN (User: 67) -->
+    <div id="easter-egg-screen" class="hidden fixed inset-0 bg-black flex flex-col items-center justify-center cursor-pointer z-50" onclick="logout()">
+        <h1 class="text-white text-8xl font-black tracking-widest animate-pulse">67</h1>
+        <p class="text-gray-500 text-sm mt-4">Click anywhere to return</p>
+    </div>
+
     <!-- MAIN DASHBOARD -->
     <div id="dashboard-section" class="hidden min-h-screen p-6">
-        <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md p-6 border border-slate-100">
+        <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md p-6 border border-slate-100">
             <div class="flex justify-between items-center border-b pb-4 mb-6">
                 <div>
                     <h1 id="dashboard-title" class="text-2xl font-bold text-slate-800">Dashboard</h1>
-                    <p class="text-xs text-slate-500">Cloud Database Connected via Supabase (PostgreSQL)</p>
+                    <p class="text-xs text-slate-500">Cloud Database Connected via Supabase</p>
                 </div>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 font-medium text-sm transition">Logout</button>
+                <div class="flex gap-3">
+                    <button id="inbox-btn" onclick="toggleInbox()" class="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 font-medium text-sm transition">📥 Inbox <span id="inbox-badge" class="bg-white text-amber-700 px-1.5 py-0.2 rounded-full text-xs font-bold">0</span></button>
+                    <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 font-medium text-sm transition">Logout</button>
+                </div>
+            </div>
+
+            <!-- INBOX MODAL / VIEW -->
+            <div id="inbox-view" class="hidden mb-8 bg-amber-50 border border-amber-200 p-5 rounded-xl">
+                <h3 class="text-lg font-bold mb-3 text-amber-900">📥 Notification & Request Inbox</h3>
+                <div id="inbox-list" class="space-y-3">
+                    <p class="text-sm text-slate-600">No pending requests.</p>
+                </div>
             </div>
 
             <!-- OWNER VIEW -->
             <div id="view-owner" class="role-view hidden">
-                <h3 class="text-lg font-bold mb-3 text-slate-700">📊 Owner Analytics: Full Inventory Audit</h3>
-                <div class="overflow-x-auto max-h-[500px] rounded-lg border border-slate-200">
-                    <table class="w-full border-collapse text-left text-sm">
-                        <thead class="bg-slate-100 text-slate-700 sticky top-0">
-                            <tr>
-                                <th class="p-3 border-b">ID</th>
-                                <th class="p-3 border-b">Product Name</th>
-                                <th class="p-3 border-b">Category</th>
-                                <th class="p-3 border-b">Price (₹)</th>
-                                <th class="p-3 border-b">Store Stock</th>
-                                <th class="p-3 border-b">Provider Warehouse Stock</th>
-                            </tr>
-                        </thead>
-                        <tbody id="owner-table-body"></tbody>
-                    </table>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-700">📊 Owner Analytics: Grid Catalog & Restock Requests</h3>
+                    <button onclick="openRestockModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">Request Restock from Provider</button>
                 </div>
+                <div id="owner-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2"></div>
             </div>
 
             <!-- PROVIDER VIEW -->
             <div id="view-provider" class="role-view hidden">
-                <h3 class="text-lg font-bold mb-3 text-slate-700">📦 Provider Supply Chain Management</h3>
-                <p class="text-sm text-slate-500 mb-4">Manage warehouse shipments to the retail store front.</p>
-                <div class="overflow-x-auto max-h-[500px] rounded-lg border border-slate-200">
-                    <table class="w-full border-collapse text-left text-sm">
-                        <thead class="bg-slate-100 text-slate-700 sticky top-0">
-                            <tr>
-                                <th class="p-3 border-b">Product Name</th>
-                                <th class="p-3 border-b">Provider Warehouse Stock</th>
-                                <th class="p-3 border-b">Current Store Stock</th>
-                                <th class="p-3 border-b">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="provider-table-body"></tbody>
-                    </table>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-700">📦 Provider Supply Chain & Custom Products</h3>
+                    <button onclick="openNewProductModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-700">+ Create Custom Product</button>
                 </div>
+                <div id="provider-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-[600px] overflow-y-auto p-2"></div>
             </div>
 
             <!-- MANAGER VIEW -->
             <div id="view-manager" class="role-view hidden">
-                <h3 class="text-lg font-bold mb-3 text-slate-700">🏷️ Manager POS Checkout & Price Controls</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Billing Form -->
-                    <div class="bg-slate-50 p-5 border border-slate-200 rounded-xl">
-                        <h4 class="font-bold text-base mb-3 text-blue-600">⚡ Point of Sale (POS) Billing</h4>
-                        <div class="mb-3">
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Select Product</label>
-                            <select id="bill-product" class="w-full p-2.5 border rounded-lg bg-white"></select>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Quantity Sold</label>
-                            <input type="number" id="bill-qty" min="1" value="1" class="w-full p-2.5 border rounded-lg bg-white">
-                        </div>
-                        <button onclick="processSale()" class="w-full bg-green-600 text-white py-2.5 rounded-lg font-bold hover:bg-green-700 transition">Complete Sale & Print Bill</button>
-                        <p id="bill-message" class="text-green-700 text-sm mt-3 font-semibold text-center"></p>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Catalog Grid -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-lg font-bold mb-3 text-slate-700">🛍️ Store Catalog & Bulk POS Cart</h3>
+                        <div id="manager-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[550px] overflow-y-auto p-2"></div>
                     </div>
-                    <!-- Quick Price Update -->
-                    <div class="bg-slate-50 p-5 border border-slate-200 rounded-xl">
-                        <h4 class="font-bold text-base mb-3 text-blue-600">💲 Dynamic Pricing Control</h4>
-                        <div class="mb-3">
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">Select Product</label>
-                            <select id="price-product" class="w-full p-2.5 border rounded-lg bg-white"></select>
+                    <!-- Cart & Checkout Sidebar -->
+                    <div class="bg-slate-50 p-5 border border-slate-200 rounded-xl flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-base mb-3 text-blue-600">🛒 Bulk Checkout Cart</h4>
+                            <div id="cart-items" class="space-y-2 mb-4 max-h-64 overflow-y-auto text-sm">
+                                <p class="text-slate-500 italic">Cart is empty</p>
+                            </div>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-xs font-bold text-slate-600 mb-1 uppercase">New Price (₹)</label>
-                            <input type="number" id="new-price" step="0.01" class="w-full p-2.5 border rounded-lg bg-white" placeholder="e.g. 550">
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between font-bold text-lg mb-4">
+                                <span>Total:</span>
+                                <span id="cart-total">₹0.00</span>
+                            </div>
+                            <button onclick="checkoutCart()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">Complete Bulk Checkout</button>
                         </div>
-                        <button onclick="updatePrice()" class="w-full bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition">Update Price in DB</button>
                     </div>
                 </div>
             </div>
@@ -122,7 +108,50 @@
         </div>
     </div>
 
-    <!-- External JS Script -->
+    <!-- MODAL FOR RESTOCK REQUEST -->
+    <div id="restock-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-96">
+            <h3 class="font-bold text-lg mb-4">Request Restock</h3>
+            <select id="restock-prod-select" class="w-full p-2.5 border rounded-lg mb-3"></select>
+            <input type="number" id="restock-qty" placeholder="Quantity needed" min="1" value="10" class="w-full p-2.5 border rounded-lg mb-4">
+            <div class="flex gap-2">
+                <button onclick="submitRestockRequest()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold">Send Request</button>
+                <button onclick="closeModals()" class="flex-1 bg-gray-300 py-2 rounded-lg font-bold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FOR NEW PRODUCT (PROVIDER) -->
+    <div id="newprod-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-96">
+            <h3 class="font-bold text-lg mb-4">Propose New Product to Owner</h3>
+            <input type="text" id="np-name" placeholder="Product Name" class="w-full p-2.5 border rounded-lg mb-3">
+            <input type="text" id="np-category" placeholder="Category" class="w-full p-2.5 border rounded-lg mb-3">
+            <input type="number" id="np-price" placeholder="Price (₹)" class="w-full p-2.5 border rounded-lg mb-3">
+            <input type="number" id="np-qty" placeholder="Initial Warehouse Stock" class="w-full p-2.5 border rounded-lg mb-4">
+            <div class="flex gap-2">
+                <button onclick="submitNewProductProposal()" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-bold">Submit to Owner</button>
+                <button onclick="closeModals()" class="flex-1 bg-gray-300 py-2 rounded-lg font-bold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECEIPT MODAL -->
+    <div id="receipt-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl w-[400px] border shadow-2xl font-mono text-sm">
+            <div class="text-center border-b pb-3 mb-3">
+                <h2 class="font-bold text-lg">STOREMS OFFICIAL RECEIPT</h2>
+                <p class="text-xs text-gray-500" id="receipt-date"></p>
+            </div>
+            <div id="receipt-body" class="space-y-2 mb-4"></div>
+            <div class="border-t pt-3 flex justify-between font-bold text-base">
+                <span>GRAND TOTAL:</span>
+                <span id="receipt-grand-total">₹0.00</span>
+            </div>
+            <button onclick="closeReceipt()" class="mt-5 w-full bg-slate-800 text-white py-2 rounded font-sans font-bold">Close Receipt</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
