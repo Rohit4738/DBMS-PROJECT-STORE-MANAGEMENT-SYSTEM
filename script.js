@@ -1,12 +1,21 @@
-const SUPABASE_URL = 'https://nnigtowruubvfuwxermo.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_2qIAef096E-hfQgKF1HHBg_GPImBtIq';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentRole = '';
 let cart = [];
 let globalProducts = [];
 
-window.onload = function() {
+window.onload = async function() {
+    // Health check to see if Supabase is online/active
+    try {
+        const { error } = await _supabase.from('products').select('product_id').limit(1);
+        if (error) throw error;
+    } catch (err) {
+        document.getElementById('offline-overlay').classList.remove('hidden');
+        return;
+    }
+
     const savedUser = localStorage.getItem('storems_username');
     const savedRole = localStorage.getItem('storems_role');
 
@@ -20,7 +29,6 @@ async function handleLogin(event) {
     const user = document.getElementById('username').value.trim();
     const pass = document.getElementById('password').value;
 
-    // Easter egg check
     if (user === '67' && pass === '67') {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('easter-egg-screen').classList.remove('hidden');
@@ -78,7 +86,6 @@ async function loadDashboardData() {
             </div>
         `).join('');
 
-        // Populate restock dropdown
         document.getElementById('restock-prod-select').innerHTML = products.map(p => `<option value="${p.product_name}">${p.product_name}</option>`).join('');
     }
 
@@ -97,7 +104,7 @@ async function loadDashboardData() {
         `).join('');
     }
 
-    // MANAGER GRID VIEW
+    // MANAGER GRID VIEW & PRICE EDIT DROPDOWN
     if (currentRole === 'manager') {
         const grid = document.getElementById('manager-grid');
         grid.innerHTML = products.map(p => `
@@ -114,6 +121,9 @@ async function loadDashboardData() {
                 </div>
             </div>
         `).join('');
+
+        const priceOptions = products.map(p => `<option value="${p.product_id}">${p.product_name} (Current: ₹${p.price})</option>`).join('');
+        document.getElementById('price-product').innerHTML = priceOptions;
     }
 }
 
@@ -129,7 +139,7 @@ async function loadInboxCount() {
         }
 
         list.innerHTML = data.map(req => `
-            <div class="bg-white p-3 rounded-lg border flex justify-between items-center text-sm">
+            <div class="bg-white p-3 rounded-lg border flex justify-between items-center text-sm shadow-sm">
                 <div>
                     <span class="font-bold text-blue-600">[${req.request_type.toUpperCase()}]</span> 
                     <b>${req.product_name}</b> (Qty: ${req.quantity}) - Requested by <i>${req.sender_role}</i>
@@ -144,8 +154,7 @@ async function loadInboxCount() {
 }
 
 function toggleInbox() {
-    const view = document.getElementById('inbox-view');
-    view.classList.toggle('hidden');
+    document.getElementById('inbox-view').classList.toggle('hidden');
 }
 
 function openRestockModal() { document.getElementById('restock-modal').classList.remove('hidden'); }
@@ -179,13 +188,11 @@ async function submitNewProductProposal() {
 
 async function approveRequest(id, type, name, qty, price, category) {
     if (type === 'restock') {
-        // Find product and increase provider stock or ship
         const prod = globalProducts.find(p => p.product_name === name);
         if (prod) {
             await _supabase.from('products').update({ provider_stock: prod.provider_stock + qty }).eq('product_id', prod.product_id);
         }
     } else if (type === 'new_product') {
-        // Add new product to catalog
         await _supabase.from('products').insert([{ product_name: name, category: category, price: price, store_stock: 0, provider_stock: qty }]);
     }
 
@@ -201,7 +208,6 @@ async function rejectRequest(id) {
     loadInboxCount();
 }
 
-// PROVIDER QUICK SHIP
 async function providerShip(id, pStock, sStock) {
     if (pStock < 10) { alert("Insufficient provider stock!"); return; }
     await _supabase.from('products').update({ provider_stock: pStock - 10, store_stock: sStock + 10 }).eq('product_id', id);
@@ -209,7 +215,6 @@ async function providerShip(id, pStock, sStock) {
     loadDashboardData();
 }
 
-// MANAGER BULK CART & RECEIPT
 function addToCart(id, name, price, stock) {
     const qty = parseInt(document.getElementById(`qty-${id}`).value);
     if (qty > stock) { alert("Exceeds available store stock!"); return; }
@@ -253,15 +258,11 @@ async function checkoutCart() {
         let subtotal = item.price * item.qty;
         grandTotal += subtotal;
 
-        // Log sale
         await _supabase.from('sales').insert([{ product_id: item.id, quantity_sold: item.qty, total_price: subtotal }]);
-
-        // Reduce stock
         const prod = globalProducts.find(p => p.product_id === item.id);
         await _supabase.from('products').update({ store_stock: prod.store_stock - item.qty }).eq('product_id', item.id);
     }
 
-    // Show Receipt Modal
     document.getElementById('receipt-date').innerText = new Date().toLocaleString();
     document.getElementById('receipt-body').innerHTML = cart.map(i => `
         <div class="flex justify-between">
@@ -275,6 +276,22 @@ async function checkoutCart() {
     cart = [];
     renderCart();
     loadDashboardData();
+}
+
+async function updatePrice() {
+    const productId = document.getElementById('price-product').value;
+    const newPrice = parseFloat(document.getElementById('new-price').value);
+
+    if (!newPrice || newPrice <= 0) { alert("Please enter a valid price."); return; }
+
+    const { error } = await _supabase.from('products').update({ price: newPrice }).eq('product_id', productId);
+    if (error) {
+        alert("Error updating price.");
+    } else {
+        alert("Product price updated successfully in database!");
+        document.getElementById('new-price').value = '';
+        loadDashboardData();
+    }
 }
 
 function closeReceipt() {
