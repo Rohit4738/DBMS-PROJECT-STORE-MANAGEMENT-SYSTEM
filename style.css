@@ -1,18 +1,17 @@
 body {
-    background-color: #f8fafc;
+    background-color: #f4f4f5;
 }
 
 .product-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #d4d4d8;
+    background: #ffffff;
+    transition: all 0.1s ease;
 }
 
 .product-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #18181b;
 }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+input, select {
+    background-color: #ffffff;
 }
